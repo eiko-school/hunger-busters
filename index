@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hunger Busters</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1117;--surface:#181c27;--card:#1e2333;--border:#2a3050;
+  --accent:#f5a623;--red:#e05c5c;--green:#4caf7d;--purple:#9b6dff;
+  --text:#e8eaf6;--muted:#7a82a0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hidden{display:none!important;}
+
+/* SHARED BUTTONS */
+.btn{border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-weight:700;border-radius:8px;transition:all .2s;letter-spacing:1px;}
+.btn-gold{background:var(--accent);color:#000;padding:12px 28px;font-size:1rem;}
+.btn-gold:hover{opacity:.85;transform:translateY(-1px);}
+.btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 16px;font-size:.8rem;}
+.btn-ghost:hover{border-color:var(--accent);}
+.btn-purple{background:rgba(155,109,255,.12);border:1px solid var(--purple);color:var(--purple);padding:9px 18px;font-size:.85rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s;}
+.btn-purple:hover{background:rgba(155,109,255,.25);}
+.btn-sm{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:5px 12px;font-size:.74rem;border-radius:6px;cursor:pointer;}
+.btn-sm:hover{color:var(--text);border-color:var(--accent);}
+.adj{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.9rem;transition:background .15s;}
+.adj:hover{background:var(--border);}
+.adj.p{color:var(--green);}.adj.m{color:var(--red);}
+
+/* ===== LOBBY ===== */
+#lobbyScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;background:radial-gradient(ellipse at 50% 0%,#1a0e00,var(--bg) 70%);}
+h1.logo{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;color:var(--accent);text-shadow:0 0 30px rgba(245,166,35,.4);}
+h1.logo span{color:#fff;}
+.lobby-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 40px;width:100%;max-width:500px;margin-top:28px;}
+.lobby-box h2{font-size:.9rem;color:var(--muted);margin-bottom:22px;letter-spacing:1px;text-transform:uppercase;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.field label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.field select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;}
+hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
+
+/* ===== ROLE SELECT ===== */
+#roleScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;background:radial-gradient(ellipse at 50% 0%,#0a0a1a,var(--bg) 70%);}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:22px 0;width:100%;max-width:460px;}
+.role-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:20px 14px;cursor:pointer;transition:all .2s;text-align:center;}
+.role-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.role-card.wb{border-color:rgba(155,109,255,.35);}
+.role-card.wb:hover{border-color:var(--purple);}
+.role-card .ico{font-size:2rem;margin-bottom:8px;}
+.role-card .rn{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;}
+.role-card.wb .rn{color:var(--purple);}
+.role-card .rd{font-size:.7rem;color:var(--muted);margin-top:4px;}
+
+/* ===== COUNTRY SCREEN ===== */
+#countryScreen header{background:linear-gradient(135deg,#1a0a00,#2d1400 60%,#0f1117);border-bottom:2px solid var(--accent);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--accent);}
+.h-title span{color:#fff;}
+.turn-badge{background:var(--accent);color:#000;font-weight:900;font-size:.78rem;padding:5px 13px;border-radius:4px;}
+.turn-badge.wb{background:var(--purple);color:#fff;}
+.c-main{padding:18px 22px;max-width:560px;margin:0 auto;}
+
+.c-hero{background:linear-gradient(135deg,var(--card),var(--surface));border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.c-hero .cn{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;}
+.pill{padding:6px 15px;border-radius:20px;font-weight:700;font-size:.78rem;}
+.pill.safe{background:rgba(76,175,125,.15);color:var(--green);border:1px solid rgba(76,175,125,.3);}
+.pill.danger{background:rgba(224,92,92,.15);color:var(--red);border:1px solid rgba(224,92,92,.4);animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+.tok-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;}
+.tok-card h3{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);font-size:.88rem;margin-bottom:12px;}
+.tok-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.tok-row:last-child{border-bottom:none;}
+.t-ico{font-size:1rem;width:22px;text-align:center;}
+.t-lbl{font-size:.76rem;color:var(--muted);width:56px;}
+.t-val{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;min-width:36px;text-align:right;}
+.t-val.pop{color:#fff}.t-val.farm{color:#7ec850}.t-val.fish{color:#4ab3e8}.t-val.live{color:#e8a14a}.t-val.trade{color:#c47ae8}
+.t-adjs{display:flex;gap:4px;margin-left:auto;}
+
+.food-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:14px;}
+.fb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.fb-row .lbl{font-size:.76rem;color:var(--muted);}
+.fb-row .val{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;}
+.fb-row .val.safe{color:var(--green);}.fb-row .val.danger{color:var(--red);}
+.prog-wrap{background:var(--surface);border-radius:6px;height:10px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:6px;transition:width .4s;}
+.prog-fill.safe{background:linear-gradient(90deg,var(--green),#a8e063);}
+.prog-fill.danger{background:linear-gradient(90deg,var(--red),#ff8080);}
+
+.money-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.money-card .lbl{font-size:.76rem;color:var(--muted);margin-bottom:3px;}
+.money-card .val{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px;}
+.money-adjs{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:210px;}
+.money-adjs .adj{width:auto;padding:0 10px;font-size:.7rem;height:26px;}
+
+.hint-box{background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:14px 18px;font-size:.8rem;color:var(--muted);line-height:1.65;}
+.hint-box strong{color:var(--accent);}
+
+/* COUNTRY LOG */
+.clog-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;}
+.clog-box .clog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.clog-box .clog-title{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:6px;}
+.clog-inner{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+.clog-inner::-webkit-scrollbar{width:4px}.clog-inner::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.clog-entry{background:var(--surface);border-radius:8px;padding:9px 12px;border-left:3px solid var(--border);}
+.clog-entry.ev-plus{border-left-color:var(--green);}
+.clog-entry.ev-minus{border-left-color:var(--red);}
+.clog-entry.ev-trade{border-left-color:#4ab3e8;}
+.clog-entry.ev-manual{border-left-color:var(--accent);}
+.clog-entry .ce-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.clog-entry .ce-turn{font-size:.66rem;color:var(--muted);}
+.clog-entry .ce-type{font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:4px;}
+.ce-type.plus{background:rgba(76,175,125,.15);color:var(--green);}
+.ce-type.minus{background:rgba(224,92,92,.15);color:var(--red);}
+.ce-type.trade{background:rgba(74,179,232,.15);color:#4ab3e8;}
+.ce-type.manual{background:rgba(245,166,35,.15);color:var(--accent);}
+.clog-entry .ce-title{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:5px;}
+.clog-entry .ce-chips{display:flex;flex-wrap:wrap;gap:4px;}
+.ce-chip{font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:5px;background:var(--card);}
+.ce-chip.pos{color:var(--green);border:1px solid rgba(76,175,125,.3);}
+.ce-chip.neg{color:var(--red);border:1px solid rgba(224,92,92,.3);}
+.ce-chip.neu{color:var(--muted);border:1px solid var(--border);}
+.clog-empty{text-align:center;padding:20px;color:var(--muted);font-size:.78rem;line-height:1.7;}
+
+/* REFLECTION PROMPT */
+.reflect-box{background:rgba(155,109,255,.06);border:1px solid rgba(155,109,255,.2);border-radius:10px;padding:14px 18px;margin-bottom:14px;font-size:.8rem;color:var(--muted);line-height:1.7;}
+.reflect-box strong{color:var(--purple);}
+
+/* ===== WB SCREEN ===== */
+#wbScreen header{background:linear-gradient(135deg,#0a0017,#180030 60%,#0f1117);border-bottom:2px solid var(--purple);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+#wbScreen header .h-title{color:var(--purple);}
+.wb-main{padding:18px 22px;max-width:960px;margin:0 auto;}
+
+.hunger-banner{background:linear-gradient(90deg,#3a0000,#1a0000);border:1px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px;}
+.hunger-banner .h-ico{font-size:1.5rem;margin-top:2px;}
+.hunger-banner .h-t{font-weight:900;color:#ff8080;font-size:.92rem;margin-bottom:4px;}
+.hunger-banner .h-l{font-size:.8rem;color:#ffaaaa;line-height:1.7;}
+.safe-banner{background:rgba(76,175,125,.08);border:1px solid rgba(76,175,125,.3);border-radius:10px;padding:12px 18px;margin-bottom:18px;font-size:.83rem;color:var(--green);font-weight:700;}
+
+.sec-t{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);font-size:.92rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sec-t::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:13px;margin-bottom:22px;}
+.ov-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s;}
+.ov-card.hungry{border-color:var(--red);}
+.ov-card.wb-c{border-color:rgba(155,109,255,.35);}
+.ov-head{background:var(--surface);padding:9px 13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+.ov-n{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2px;}
+.ov-n.hungry{color:var(--red);}.ov-n.wb-c{color:var(--purple);}
+.ov-pill{font-size:.66rem;padding:3px 9px;border-radius:10px;font-weight:700;}
+.ov-pill.safe{background:rgba(76,175,125,.15);color:var(--green);border:1px solid rgba(76,175,125,.25);}
+.ov-pill.danger{background:rgba(224,92,92,.15);color:var(--red);border:1px solid rgba(224,92,92,.3);}
+.ov-body{padding:9px 13px;}
+.ov-tr{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.76rem;}
+.ov-tr:last-child{border-bottom:none;}
+.ov-tr .ico{width:17px;text-align:center;}
+.ov-tr .lbl{color:var(--muted);width:52px;}
+.ov-tr .vl{font-family:'Bebas Neue',sans-serif;font-size:.93rem;min-width:28px;text-align:right;}
+.ov-tr .vl.pop{color:#fff}.ov-tr .vl.farm{color:#7ec850}.ov-tr .vl.fish{color:#4ab3e8}.ov-tr .vl.live{color:#e8a14a}.ov-tr .vl.trade{color:#c47ae8}
+.ov-tr .oa{display:flex;gap:3px;margin-left:auto;}
+.ov-tr .oa .adj{width:21px;height:21px;font-size:.78rem;}
+.ov-money{display:flex;justify-content:space-between;align-items:center;padding-top:7px;margin-top:3px;border-top:1px solid var(--border);font-size:.76rem;}
+.ov-money .lbl{color:var(--muted);}
+.ov-money .vl{font-family:'Bebas Neue',sans-serif;color:var(--accent);font-size:.92rem;}
+.ov-money .oma{display:flex;gap:3px;}
+.ov-money .oma .adj{width:auto;padding:0 7px;font-size:.66rem;height:21px;}
+.ov-food{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border-radius:5px;padding:5px 8px;margin-top:7px;font-size:.73rem;}
+.ov-food .lbl{color:var(--muted);}
+.ov-food .vl{font-family:'Bebas Neue',sans-serif;font-size:.88rem;}
+.ov-food .vl.safe{color:var(--green);}.ov-food .vl.danger{color:var(--red);}
+
+/* EVENT PANEL */
+.ev-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px;}
+.ev-tabs{display:flex;gap:8px;margin-bottom:12px;}
+.ev-tab{padding:7px 16px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.8rem;font-weight:700;transition:all .2s;}
+.ev-tab.active.plus{background:rgba(76,175,125,.15);border-color:var(--green);color:var(--green);}
+.ev-tab.active.minus{background:rgba(224,92,92,.15);border-color:var(--red);color:var(--red);}
+.ev-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;max-height:350px;overflow-y:auto;padding-right:3px;}
+.ev-list::-webkit-scrollbar{width:4px}.ev-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.ev-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;transition:all .2s;}
+.ev-item:hover{transform:translateY(-1px);}
+.ev-item.plus:hover{border-color:var(--green);}.ev-item.minus:hover{border-color:var(--red);}
+.ev-num{font-family:'Bebas Neue',sans-serif;font-size:.72rem;color:var(--muted);}
+.ev-title{font-weight:700;font-size:.8rem;margin:3px 0;}
+.ev-eff{font-size:.68rem;font-weight:700;}
+.ev-item.plus .ev-eff{color:var(--green);}.ev-item.minus .ev-eff{color:var(--red);}
+.ev-desc{font-size:.66rem;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ACTIONS ROW */
+.act-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+
+/* LOG */
+.log-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 18px;}
+.log-inner{max-height:190px;overflow-y:auto;font-size:.74rem;color:var(--muted);line-height:1.9;}
+.log-inner::-webkit-scrollbar{width:4px}.log-inner::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.le .tt{color:var(--accent);font-weight:700;margin-right:5px;}
+.le .et{font-weight:700;}
+.le.pl .et{color:var(--green);}.le.mi .et{color:var(--red);}.le.sy .et{color:var(--purple);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:450px;position:relative;}
+.m-close{position:absolute;top:13px;right:13px;background:var(--surface);border:1px solid var(--border);color:var(--muted);width:27px;height:27px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;}
+.m-close:hover{color:var(--text);}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:2px;margin-bottom:4px;}
+.modal h3.plus{color:var(--green);}.modal h3.minus{color:var(--red);}
+.modal .eff{font-size:.8rem;color:var(--accent);font-weight:700;margin-bottom:7px;}
+.modal .dsc{font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:16px;}
+.modal .mlbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+.chk-list{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.chk{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:.8rem;user-select:none;transition:all .15s;}
+.chk input{accent-color:var(--accent);cursor:pointer;}
+.chk:hover{border-color:var(--accent);}
+.m-foot{display:flex;gap:9px;justify-content:flex-end;}
+.tr-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tr-row label{font-size:.74rem;color:var(--muted);width:52px;}
+.tr-row select,.tr-row input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;flex:1;}
+</style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div id="lobbyScreen">
+  <h1 class="logo">HUNGER <span>BUSTERS</span></h1>
+  <p style="color:var(--muted);font-size:.83rem;margin-top:6px;letter-spacing:2px">食料安全保障シミュレーションゲーム</p>
+  <div class="lobby-box">
+    <h2>ゲームセットアップ（先生用）</h2>
+    <div class="field"><label>国 1（2人担当）</label>
+      <select id="sel1"><option>日本</option><option>アメリカ</option><option>インド</option><option>カナダ</option><option>イギリス</option><option>エジプト</option><option>アルゼンチン</option><option>ブラジル</option><option>オーストラリア</option><option>ベトナム</option></select></div>
+    <div class="field"><label>国 2（2人担当）</label>
+      <select id="sel2"><option>アメリカ</option><option>日本</option><option>インド</option><option>カナダ</option><option>イギリス</option><option>エジプト</option><option>アルゼンチン</option><option>ブラジル</option><option>オーストラリア</option><option>ベトナム</option></select></div>
+    <div class="field"><label>国 3（2人担当）</label>
+      <select id="sel3"><option>ブラジル</option><option>日本</option><option>アメリカ</option><option>インド</option><option>カナダ</option><option>イギリス</option><option>エジプト</option><option>アルゼンチン</option><option>オーストラリア</option><option>ベトナム</option></select></div>
+    <hr class="div">
+    <button class="btn btn-gold" style="width:100%" onclick="setupGame()">▶ ゲーム開始</button>
+  </div>
+</div>
+
+<!-- ROLE SELECT -->
+<div id="roleScreen" class="hidden">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;background:radial-gradient(ellipse at 50% 0%,#0a0a1a,var(--bg) 70%)">
+    <h1 class="logo">HUNGER <span>BUSTERS</span></h1>
+    <p style="color:var(--muted);font-size:.83rem;margin-top:6px;letter-spacing:2px">あなたの役割を選んでください</p>
+    <p style="color:var(--muted);font-size:.73rem;margin-top:4px;margin-bottom:24px">※ 各グループのパソコンで担当する役割を選択します</p>
+    <div class="role-grid" id="roleGrid"></div>
+  </div>
+</div>
+
+<!-- COUNTRY SCREEN -->
+<div id="countryScreen" class="hidden">
+  <header>
+    <div class="h-title">HUNGER <span>BUSTERS</span></div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="turn-badge" id="cTurn">ターン 1</div>
+      <button class="btn btn-ghost" onclick="backToRole()">← 役割選択</button>
+    </div>
+  </header>
+  <div class="c-main">
+    <div class="c-hero">
+      <div>
+        <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">担当国</div>
+        <div id="cName" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px"></div>
+      </div>
+      <div id="cPill"></div>
+    </div>
+    <div class="tok-card">
+      <h3>📊 トークン状況</h3>
+      <div id="cTokRows"></div>
+    </div>
+    <div class="food-bar" id="cFoodBar"></div>
+    <div class="money-card">
+      <div>
+        <div class="lbl">💴 資金</div>
+        <div class="val" id="cMoney">—</div>
+      </div>
+      <div class="money-adjs">
+        <button class="adj m" onclick="cAdjMoney(-5000)">-5k</button>
+        <button class="adj m" onclick="cAdjMoney(-10000)">-1万</button>
+        <button class="adj p" onclick="cAdjMoney(5000)">+5k</button>
+        <button class="adj p" onclick="cAdjMoney(10000)">+1万</button>
+      </div>
+    </div>
+    <div class="hint-box">
+      <strong>📋 イベントカードについて</strong><br>
+      イベントカードは机の上のカードを1枚ずつ順番に引きます。<br>
+      カード効果が自国に適用されたら、このページのトークン・資金を自分で更新してください。<br><br>
+      <strong>💬 国間交渉について</strong><br>
+      他の国との交渉・協力は <strong>直接話し合いながら</strong> 進めてください。<br>
+      取引が成立したら、合意した内容をもとに各自でトークン・資金を更新します。
+    </div>
+
+    <div class="clog-box">
+      <div class="clog-head">
+        <div class="clog-title">📜 自国の記録</div>
+        <button class="btn-sm" onclick="clearCLog()">クリア</button>
+      </div>
+      <div class="clog-inner" id="cLogInner">
+        <div class="clog-empty">
+          まだ記録はありません。<br>
+          イベントカードや交渉でトークン・資金が変動すると<br>ここに履歴が残ります。
+        </div>
+      </div>
+    </div>
+
+    <div class="reflect-box">
+      <strong>🔍 振り返りのヒント</strong><br>
+      ・なぜこの結果になったのだろう？<br>
+      ・自分たちの判断は正しかったか？<br>
+      ・次のターンに向けて、何を変えるべきか？<br>
+      ・他の国の動きをどう読むか？
+    </div>
+  </div>
+</div>
+
+<!-- WORLD BANK SCREEN -->
+<div id="wbScreen" class="hidden">
+  <header>
+    <div class="h-title" style="color:var(--purple)">🏦 世界銀行</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="turn-badge wb" id="wbTurn">ターン 1</div>
+      <button class="adj m" onclick="changeTurn(-1)" style="width:30px;height:30px">◀</button>
+      <button class="adj p" onclick="changeTurn(1)" style="width:30px;height:30px">▶</button>
+      <button class="btn btn-ghost" onclick="backToRole()">← 役割選択</button>
+    </div>
+  </header>
+  <div class="wb-main">
+    <div id="wbBanner"></div>
+    <div class="sec-t">全国・世界銀行 状況一覧</div>
+    <div class="ov-grid" id="wbGrid"></div>
+    <div class="ev-panel">
+      <div style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--accent);font-size:1.05rem;margin-bottom:11px">📋 イベントカード</div>
+      <div class="ev-tabs">
+        <button class="ev-tab active plus" id="tabPlus" onclick="switchTab('plus')">＋ プラス</button>
+        <button class="ev-tab minus" id="tabMinus" onclick="switchTab('minus')">－ マイナス</button>
+      </div>
+      <div class="ev-list" id="evList"></div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--purple);font-size:1.05rem;margin-bottom:11px">🏦 世界銀行アクション</div>
+    <div class="act-row">
+      <button class="btn-purple" onclick="openMM()">💰 資金援助</button>
+      <button class="btn-purple" onclick="openTM()">📦 トークン援助</button>
+      <button class="btn-purple" style="border-color:#4ab3e8;color:#4ab3e8;background:rgba(74,179,232,.1)" onclick="openTrade()">🤝 国間取引</button>
+    </div>
+    <div class="log-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="sec-t" style="margin:0;flex:1">📜 ゲームログ</div>
+        <button class="btn-sm" onclick="clearLog()">クリア</button>
+      </div>
+      <div class="log-inner" id="logEl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="overlay" id="evModal">
+  <div class="modal">
+    <button class="m-close" onclick="closeEvM()">✕</button>
+    <h3 id="emTitle"></h3>
+    <div class="eff" id="emEff"></div>
+    <div class="dsc" id="emDesc"></div>
+    <div class="mlbl">適用する国を選択</div>
+    <div class="chk-list" id="emChecks"></div>
+    <div class="m-foot">
+      <button class="btn-sm" onclick="closeEvM()">キャンセル</button>
+      <button class="btn btn-gold" onclick="applyEv()">適用する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANNOUNCE MODAL -->
+<div class="overlay" id="announceModal">
+  <div class="modal" style="max-width:520px">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:2rem;margin-bottom:6px">📢</div>
+      <h3 style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px">各国へのアナウンス</h3>
+      <p style="font-size:.76rem;color:var(--muted);margin-top:4px">以下の内容を各国担当者に口頭で伝え、各自のPCで更新してもらってください</p>
+    </div>
+    <div id="announceContent"></div>
+    <div style="margin-top:20px">
+      <button class="btn btn-gold" style="width:100%;font-size:1rem" onclick="$('announceModal').classList.remove('open')">✓ アナウンス完了</button>
+    </div>
+  </div>
+</div>
+
+<!-- MONEY MODAL -->
+<div class="overlay" id="moneyModal">
+  <div class="modal">
+    <button class="m-close" onclick="closeMM()">✕</button>
+    <h3 style="color:var(--purple)">💰 資金援助</h3>
+    <p style="font-size:.76rem;color:var(--muted);margin:8px 0 18px">世界銀行から資金を送ります</p>
+    <div class="tr-row"><label>送り先</label><select id="mTo"></select></div>
+    <div class="tr-row"><label>金額</label><input type="number" id="mAmt" value="10000" min="0" step="1000"><span style="font-size:.78rem;color:var(--muted)">円</span></div>
+    <div class="m-foot" style="margin-top:16px">
+      <button class="btn-sm" onclick="closeMM()">キャンセル</button>
+      <button class="btn btn-gold" onclick="doMM()">送金する</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOKEN MODAL -->
+<div class="overlay" id="tokenModal">
+  <div class="modal">
+    <button class="m-close" onclick="closeTM()">✕</button>
+    <h3 style="color:var(--purple)">📦 トークン援助</h3>
+    <p style="font-size:.76rem;color:var(--muted);margin:8px 0 18px">世界銀行からトークンを贈与します</p>
+    <div class="tr-row"><label>送り先</label><select id="tTo"></select></div>
+    <div class="tr-row"><label>種類</label>
+      <select id="tType"><option value="farm">農業</option><option value="fish">漁業</option><option value="livestock">畜産</option><option value="trade">貿易</option><option value="pop">人口</option></select>
+    </div>
+    <div class="tr-row"><label>数量</label><input type="number" id="tAmt" value="5" min="1"><span style="font-size:.78rem;color:var(--muted)">個</span></div>
+    <div class="m-foot" style="margin-top:16px">
+      <button class="btn-sm" onclick="closeTM()">キャンセル</button>
+      <button class="btn btn-gold" onclick="doTM()">贈与する</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE MODAL -->
+<div class="overlay" id="tradeModal">
+  <div class="modal" style="max-width:500px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden">
+    <div style="flex-shrink:0;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px">
+      <button class="m-close" onclick="closeTrade()">✕</button>
+      <h3 style="color:#4ab3e8;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px">🤝 国間取引</h3>
+      <p style="font-size:.76rem;color:var(--muted);margin-top:4px">両国が合意した取引内容を入力し、世界銀行が承認してください</p>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding-right:4px">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:16px">
+        <div>
+          <div style="font-size:.68rem;color:var(--muted);margin-bottom:5px;letter-spacing:1px">売り手（譲渡する国）</div>
+          <select id="tradeSeller" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem"></select>
+        </div>
+        <div style="font-size:1.4rem;color:var(--muted);text-align:center;padding-top:18px">→</div>
+        <div>
+          <div style="font-size:.68rem;color:var(--muted);margin-bottom:5px;letter-spacing:1px">買い手（受け取る国）</div>
+          <select id="tradeBuyer" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem"></select>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px">📦 取引するトークン</div>
+        <div class="tr-row">
+          <label>種類</label>
+          <select id="tradeTokenType" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem">
+            <option value="farm">🌾 農業トークン</option>
+            <option value="fish">🐟 漁業トークン</option>
+            <option value="livestock">🐄 畜産トークン</option>
+            <option value="trade">🚢 貿易トークン</option>
+          </select>
+        </div>
+        <div class="tr-row">
+          <label>数量</label>
+          <input type="number" id="tradeTokenAmt" value="5" min="1" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem">
+          <span style="font-size:.78rem;color:var(--muted)">個</span>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px">💴 支払い金額（買い手 → 売り手）</div>
+        <div class="tr-row">
+          <label>金額</label>
+          <input type="number" id="tradePrice" value="25000" min="0" step="1000" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem">
+          <span style="font-size:.78rem;color:var(--muted)">円</span>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:6px">※ 0円の場合は無償譲渡になります</div>
+      </div>
+
+      <div id="tradePreview" style="margin-bottom:8px"></div>
+    </div>
+
+    <div style="flex-shrink:0;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;display:flex;gap:9px;justify-content:flex-end">
+      <button class="btn-sm" onclick="closeTrade()">キャンセル</button>
+      <button class="btn btn-gold" onclick="doTrade()">✓ 取引を承認する</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE ANNOUNCE MODAL -->
+<div class="overlay" id="tradeAnnounceModal">
+  <div class="modal" style="max-width:500px">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:2rem;margin-bottom:6px">🤝</div>
+      <h3 style="color:#4ab3e8;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px">取引成立！</h3>
+      <p style="font-size:.76rem;color:var(--muted);margin-top:4px">以下の内容を各国担当者に口頭で伝え、各自のPCで更新してもらってください</p>
+    </div>
+    <div id="tradeAnnounceContent"></div>
+    <div style="margin-top:20px">
+      <button class="btn btn-gold" style="width:100%;font-size:1rem" onclick="$('tradeAnnounceModal').classList.remove('open')">✓ アナウンス完了</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const INIT={
+  '日本':      {pop:80, money:80000,farm:15,fish:20,livestock:5, trade:40},
+  'アメリカ':  {pop:120,money:90000,farm:50,fish:10,livestock:40,trade:50},
+  'インド':    {pop:150,money:70000,farm:80,fish:10,livestock:20,trade:40},
+  'カナダ':    {pop:60, money:90000,farm:25,fish:10,livestock:15,trade:20},
+  'イギリス':  {pop:90, money:90000,farm:25,fish:25,livestock:10,trade:40},
+  'エジプト':  {pop:50, money:40000,farm:25,fish:20,livestock:5, trade:25},
+  'アルゼンチン':{pop:50,money:70000,farm:20,fish:20,livestock:10,trade:25},
+  'ブラジル':  {pop:70, money:50000,farm:20,fish:5, livestock:25,trade:20},
+  'オーストラリア':{pop:40,money:80000,farm:20,fish:5,livestock:15,trade:20},
+  'ベトナム':  {pop:40, money:50000,farm:15,fish:15,livestock:5, trade:30},
+};
+const WB_INIT={pop:0,money:200000,farm:20,fish:20,livestock:20,trade:20};
+
+const PLUS_EV=[
+  {num:1,title:'貸農園による自家栽培の増加',eff:'農業トークン2個獲得 / Dice: 2か国',desc:'都市近郊などで貸農園がブームとなり、多くの市民が自家栽培を始める。地域の食料自給力が向上。',tok:{farm:2}},
+  {num:2,title:'OKシードマーク導入！',eff:'農業トークン3個獲得 / Dice: 2か国',desc:'伝統的な育種方法による「優良種子」を保証する認証マークが普及し消費者の信頼を獲得。',tok:{farm:3}},
+  {num:3,title:'アニマルウェルフェアの意識向上',eff:'畜産業トークンを1個獲得',desc:'動物福祉に配慮した飼育方法の認知度が上がり、倫理的な消費を望む声が高まる。',tok:{livestock:1}},
+  {num:4,title:'GMOフリーの波',eff:'農業トークンを1個獲得',desc:'遺伝子組み換えやゲノム編集を使用しない食品への関心が高まる。',tok:{farm:1}},
+  {num:5,title:'有機JASマークの拡大',eff:'農業トークン1個獲得 / 日本のみ',desc:'有機JASマーク付きの農産物の生産者と消費者が増え、持続可能な農業への移行が進む。',tok:{farm:1}},
+  {num:6,title:'スラッシュルールで学ぶ食品添加物',eff:'資金を5,000円獲得',desc:'食品添加物の情報を分かりやすく表示する「スラッシュルール」が導入。',tok:{},money:5000},
+  {num:7,title:'固定種野菜ルネッサンス',eff:'農業トークン2個獲得 / 農業最少国',desc:'地域固有の種「固定種野菜」の価値が見直され、種子の多様性を守る動きが活発化。',tok:{farm:2}},
+  {num:8,title:'バーコードの裏側を知る',eff:'資金を5,000円獲得',desc:'商品のバーコードから生産履歴や流通経路を確認できるシステムが普及。',tok:{},money:5000},
+  {num:9,title:'消費者トレーサビリティ意識アップ',eff:'農業・漁業・畜産トークンどれでも3個獲得',desc:'生産者や栽培方法まで追跡できる意識が向上し、国産品の購入が増加。',tok:{anyFood:3}},
+  {num:10,title:'食品ロス削減運動の成功',eff:'農業・漁業・畜産トークンどれでも1個獲得',desc:'各家庭や企業での食品ロス削減の取り組みが功を奏す。',tok:{anyFood:1}},
+];
+const MINUS_EV=[
+  {num:1,title:'パンデミック再発生',eff:'人口-10 / 資金-20,000円',desc:'新型の感染症が世界的に流行し、労働力不足や流通の停滞を引き起こす。',tok:{pop:-10},money:-20000},
+  {num:2,title:'種子法廃止の波紋',eff:'農業-5 / Dice: 1か国',desc:'種子法廃止後、主要農作物の種子が海外企業に独占され、国内農業に影響。',tok:{farm:-5}},
+  {num:3,title:'陸上養殖への転換',eff:'漁業-5 / 貿易+2',desc:'海洋環境悪化のため大規模な陸上養殖への投資が増加。初期コストが高い。',tok:{fish:-5,trade:2}},
+  {num:4,title:'ゲノム編集食品の流通拡大',eff:'農業-5 / Dice: 1か国以外',desc:'ゲノム編集された農産物が市場に流通し、安全性への疑問から消費者の買い控え。',tok:{farm:-5}},
+  {num:5,title:'水産物品質表示基準の引き下げ',eff:'漁業-2 / 漁業最少国',desc:'水産物の品質表示基準が緩和され、消費者からの信頼が低下。',tok:{fish:-2}},
+  {num:6,title:'太陽活動の鎮静化',eff:'農業・畜産・漁業トークン半分',desc:'太陽の黒点活動の大幅低下。地球の気温が低下し食糧生産が長期的打撃。',tok:{farm:'half',fish:'half',livestock:'half'}},
+  {num:7,title:'加工品の原材料追跡困難',eff:'資金-10,000円 / G7加盟国',desc:'加工食品の原材料が複雑化し、産地や添加物の表示が不透明になる。',tok:{},money:-10000},
+  {num:8,title:'家畜飼料への遺伝子組み換え利用拡大',eff:'畜産-5 / 畜産最多国',desc:'安価な遺伝子組み換え飼料の利用が一般化し、畜産物の安全性への懸念が高まる。',tok:{livestock:-5}},
+  {num:9,title:'コオロギパウダー食品、流通拡大',eff:'資金-10,000円 / アジアの国',desc:'環境負荷低減のためコオロギパウダー使用食品が普及。消費者の抵抗感が強い。',tok:{},money:-10000},
+  {num:10,title:'飼育ホルモン剤使用牛肉の流通',eff:'畜産-2',desc:'成長促進のためのホルモン剤を使用した牛肉の輸入が増加。',tok:{livestock:-2}},
+  {num:11,title:'食品添加物基準の引き下げ',eff:'資金-10,000円',desc:'食品添加物の使用基準が緩和され、安全性への不安から食料全体への不信感が高まる。',tok:{},money:-10000},
+  {num:12,title:'富士山噴火',eff:'農業/畜産 全没収（日本）/ 農業・畜産半分 Dice: 1か国',desc:'富士山が噴火し、大規模な火山灰が首都圏に。物流と交通網が停止。',tok:{}},
+  {num:13,title:'大規模サイバー攻撃',eff:'農業・畜産トークン半分没収',desc:'正体不明のハッカー集団が国の電力・通信網をハッキング。物流システムの停止。',tok:{farm:'half',livestock:'half'}},
+  {num:14,title:'政府による減産要請（牛の殺処分）',eff:'畜産-5 / 資金+10,000円（補助金）Dice: 1か国',desc:'国際的な価格競争により、政府が余剰な牛の殺処分を補助金付きで要請。',tok:{livestock:-5},money:10000},
+  {num:15,title:'政府による減反要請',eff:'農業-10 / 資金+20,000円（補助金）',desc:'コメの供給過剰により、政府が農家に対して補助金付きで減反を要請。',tok:{farm:-10},money:20000},
+  {num:16,title:'農家の高齢化と後継者不足',eff:'農業-5 / 日本のみ',desc:'農家の高齢化が進み、後継者が見つからず、耕作放棄地が増加。',tok:{farm:-5}},
+  {num:17,title:'代用卵の流通拡大',eff:'畜産-5 / 畜産最多国',desc:'植物由来の代用卵が大量に流通し、養鶏農家が打撃を受ける。',tok:{livestock:-5}},
+  {num:18,title:'戦争による穀物飼料の流通減少',eff:'畜産-5 / Dice: 1か国',desc:'国際紛争により家畜飼料の主要な穀物の輸入が困難になり畜産物の生産量が激減。',tok:{livestock:-5}},
+  {num:19,title:'フードテックで作られた食品の流通',eff:'資金+100,000円 / 人口-3',desc:'核心的なフードテックが市場に新しい価値をもたらす一方、健康被害の可能性がある。',tok:{pop:-3},money:100000},
+  {num:20,title:'移民受け入れ',eff:'貿易半分 / Dice: 1か国',desc:'労働力不足を補うため、移民受け入れの法制度を改正。さまざまな社会的課題が発生。',tok:{trade:'half'}},
+  {num:21,title:'クラウドシーディング失敗による大豪雨',eff:'農業-5 / Dice: 1か国',desc:'人工降雨実験が失敗し、予期せぬ大豪雨が発生。農作物が水害で壊滅的な被害。',tok:{farm:-5}},
+  {num:22,title:'マイクロプラスチックによる海産物汚染',eff:'漁業-5',desc:'マイクロプラスチックによる汚染。人間は1週間でクレジットカード1枚分のプラスチックを摂取。',tok:{fish:-5}},
+  {num:23,title:'海水温上昇による漁獲量の減少',eff:'漁業-2',desc:'気候変動が漁業生産に与える直接的な影響。海流が滞留する危険性も高まる。',tok:{fish:-2}},
+  {num:24,title:'戦争によるエネルギー輸入ルート変更',eff:'資金-20,000円 / 貿易最多国',desc:'戦争により輸入ルートの変更や海上輸送コストが大幅に高騰。食料輸入費用が急増。',tok:{},money:-20000},
+  {num:25,title:'海上風力発電建設 漁場環境の悪化',eff:'漁業-5 / 漁業最多国',desc:'漁場調査をせずに、地域住民、漁業関係者の声を無視して建設。',tok:{fish:-5}},
+  {num:26,title:'国際的な経済制裁発動',eff:'貿易半分 / Dice: 1か国',desc:'海洋汚染や乱獲により、主要な漁場の資源が枯渇。漁獲量が大幅に減少。',tok:{trade:'half'}},
+  {num:27,title:'水不足の深刻化',eff:'農業-6',desc:'水資源の近くを外国企業の土地買収が進み工場建設相次ぐ。農業用水の確保が困難に。',tok:{farm:-6}},
+  {num:28,title:'主要輸出国での食料禁輸措置',eff:'貿易-8 / Dice: 2か国',desc:'世界的な食料不足や自国優先主義の高まりにより、食料輸出国が輸出を厳しく制限。',tok:{trade:-8}},
+  {num:29,title:'山火事発生による農地・牧場の減少',eff:'農業-4 / 畜産-4 / Dice: 1か国',desc:'大規模な山火事が発生し、広範囲の農地や牧場が焼失。食料生産能力に甚大な被害。',tok:{farm:-4,livestock:-4}},
+  {num:30,title:'消費者の特定食品忌避運動',eff:'産業トークン-5（自由組合せ）/ Dice: 1か国',desc:'原発事故により、放射能汚染による不買運動がおこる。',tok:{anyFood:-5}},
+  {num:31,title:'大地震の発生',eff:'農業/畜産トークン全没収 / 農業半分没収（同大陸）',desc:'M8の巨大地震の発生。国の産業やインフラに多大な損失。同じ大陸の国も影響あり。',tok:{farm:'zero',livestock:'zero'}},
+  {num:32,title:'小氷河期の到来',eff:'農業・畜産トークン半分没収',desc:'小氷河期が再び再来。極端な低温と異常気象により食糧生産が激減、飢饉の発生。',tok:{farm:'half',livestock:'half'}},
+];
+
+// ===== STATE =====
+const G={turn:1,countries:{},wb:{},sel:[],log:[],countryLogs:{},evTab:'plus',curEv:null};
+let cRole=null;
+
+// ===== HELPERS =====
+const food=d=>d.farm+d.fish+d.livestock+d.trade;
+const isHungry=n=>{const d=G.countries[n];return d&&d.pop>food(d);};
+const gd=n=>n==='世界銀行'?G.wb:G.countries[n];
+const $=id=>document.getElementById(id);
+function show(id){$(id).classList.remove('hidden');}
+function hide(id){$(id).classList.add('hidden');}
+
+// ===== SETUP =====
+function setupGame(){
+  const s1=$('sel1').value,s2=$('sel2').value,s3=$('sel3').value;
+  if(new Set([s1,s2,s3]).size<3){alert('3か国は異なる国を選んでください。');return;}
+  G.sel=[s1,s2,s3];
+  G.countries={};G.sel.forEach(n=>{G.countries[n]={...INIT[n]};});
+  G.wb={...WB_INIT};G.turn=1;G.log=[];
+  G.countryLogs={};G.sel.forEach(n=>{G.countryLogs[n]=[];});
+  addLog('ゲーム開始',`参加国: ${G.sel.join(', ')} + 世界銀行`,'sys');
+  hide('lobbyScreen');show('roleScreen');buildRoles();
+}
+
+const FLAGS={'日本':'🇯🇵','アメリカ':'🇺🇸','インド':'🇮🇳','カナダ':'🇨🇦','イギリス':'🇬🇧',
+  'エジプト':'🇪🇬','アルゼンチン':'🇦🇷','ブラジル':'🇧🇷','オーストラリア':'🇦🇺','ベトナム':'🇻🇳'};
+
+function buildRoles(){
+  const g=$('roleGrid');g.innerHTML='';
+  [...G.sel,'世界銀行'].forEach(r=>{
+    const isWB=r==='世界銀行';
+    const d=document.createElement('div');
+    d.className='role-card'+(isWB?' wb':'');
+    d.innerHTML=`<div class="ico">${isWB?'🏦':FLAGS[r]||'🌍'}</div>
+      <div class="rn">${r}</div>
+      <div class="rd">${isWB?'全国情報を把握・イベント操作':'自国の状況のみ閲覧'}</div>`;
+    d.onclick=()=>enterRole(r);
+    g.appendChild(d);
+  });
+}
+
+function enterRole(role){
+  hide('roleScreen');
+  if(role==='世界銀行'){show('wbScreen');renderWB();}
+  else{cRole=role;show('countryScreen');renderCountry();}
+}
+
+function backToRole(){
+  hide('countryScreen');hide('wbScreen');show('roleScreen');buildRoles();
+}
+
+// ===== COUNTRY =====
+function renderCountry(){
+  const d=G.countries[cRole];
+  $('cTurn').textContent=`ターン ${G.turn}`;
+  $('cName').textContent=cRole;
+  const hungry=isHungry(cRole);
+  $('cPill').innerHTML=`<div class="pill ${hungry?'danger':'safe'}">${hungry?'⚠ 飢餓発生中':'✓ 安全'}</div>`;
+  const toks=[
+    {ico:'👥',lbl:'人口',key:'pop',cls:'pop'},
+    {ico:'🌾',lbl:'農業',key:'farm',cls:'farm'},
+    {ico:'🐟',lbl:'漁業',key:'fish',cls:'fish'},
+    {ico:'🐄',lbl:'畜産',key:'livestock',cls:'live'},
+    {ico:'🚢',lbl:'貿易',key:'trade',cls:'trade'},
+  ];
+  $('cTokRows').innerHTML=toks.map(t=>`<div class="tok-row">
+    <span class="t-ico">${t.ico}</span><span class="t-lbl">${t.lbl}</span>
+    <span class="t-val ${t.cls}">${d[t.key]}</span>
+    <div class="t-adjs">
+      <button class="adj m" onclick="cAdj('${t.key}',-1)">－</button>
+      <button class="adj m" onclick="cAdj('${t.key}',-5)">-5</button>
+      <button class="adj p" onclick="cAdj('${t.key}',5)">+5</button>
+      <button class="adj p" onclick="cAdj('${t.key}',1)">＋</button>
+    </div></div>`).join('');
+  const f=food(d),pct=d.pop===0?100:Math.min(100,Math.round(f/d.pop*100)),diff=f-d.pop;
+  $('cFoodBar').innerHTML=`
+    <div class="fb-row"><span class="lbl">🌽 食料合計</span><span class="val ${hungry?'danger':'safe'}">${f}</span></div>
+    <div class="fb-row"><span class="lbl">👥 人口</span><span class="val">${d.pop}</span></div>
+    <div class="prog-wrap" style="margin:8px 0"><div class="prog-fill ${hungry?'danger':'safe'}" style="width:${pct}%"></div></div>
+    <div style="font-size:.73rem;color:${hungry?'var(--red)':'var(--green)'};text-align:right;font-weight:700">
+      ${diff>=0?'余剰':'不足'}: ${Math.abs(diff)} (${pct}%)</div>`;
+  $('cMoney').textContent=d.money.toLocaleString()+'円';
+  renderCLog();
+}
+
+// ===== COUNTRY LOG =====
+const TOKNAMES={pop:'人口',farm:'農業',fish:'漁業',livestock:'畜産',trade:'貿易',money:'資金'};
+const TOKICONS={pop:'👥',farm:'🌾',fish:'🐟',livestock:'🐄',trade:'🚢',money:'💴'};
+
+function addCLog(country, entry){
+  if(!G.countryLogs[country]) G.countryLogs[country]=[];
+  G.countryLogs[country].unshift({...entry, turn:G.turn, time:new Date().toLocaleTimeString('ja-JP')});
+}
+
+function renderCLog(){
+  const el=$('cLogInner');
+  if(!el)return;
+  const logs=(G.countryLogs[cRole]||[]);
+  if(!logs.length){
+    el.innerHTML=`<div class="clog-empty">まだ記録はありません。<br>イベントカードや交渉でトークン・資金が変動すると<br>ここに履歴が残ります。</div>`;
+    return;
+  }
+  el.innerHTML=logs.map(e=>{
+    const chips=e.changes.map(c=>{
+      const pos=c.delta>0;
+      const label=`${TOKICONS[c.key]||''}${TOKNAMES[c.key]||c.key} ${pos?'+':''}${c.key==='money'?c.delta.toLocaleString()+'円':c.delta}`;
+      return `<span class="ce-chip ${pos?'pos':'neg'}">${label}</span>`;
+    }).join('');
+    const typeLabel={plus:'＋イベント',minus:'－イベント',trade:'国間取引',manual:'手動更新'}[e.type]||'変動';
+    const typeCls={plus:'plus',minus:'minus',trade:'trade',manual:'manual'}[e.type]||'manual';
+    return `<div class="clog-entry ev-${e.type}">
+      <div class="ce-top">
+        <span class="ce-turn">ターン ${e.turn}　${e.time}</span>
+        <span class="ce-type ${typeCls}">${typeLabel}</span>
+      </div>
+      <div class="ce-title">${e.title}</div>
+      <div class="ce-chips">${chips}</div>
+    </div>`;
+  }).join('');
+}
+
+function clearCLog(){
+  if(G.countryLogs[cRole]) G.countryLogs[cRole]=[];
+  renderCLog();
+}
+
+function cAdj(key,delta){
+  const d=G.countries[cRole];
+  const before=d[key];
+  d[key]=Math.max(0,d[key]+delta);
+  const actual=d[key]-before;
+  if(actual!==0){
+    addCLog(cRole,{type:'manual',title:'手動更新',changes:[{key,delta:actual}]});
+  }
+  renderCountry();
+}
+function cAdjMoney(delta){
+  const d=G.countries[cRole];
+  const before=d.money;
+  d.money=Math.max(0,d.money+delta);
+  const actual=d.money-before;
+  if(actual!==0){
+    addCLog(cRole,{type:'manual',title:'手動更新',changes:[{key:'money',delta:actual}]});
+  }
+  renderCountry();
+}
+
+// ===== WB =====
+function renderWB(){
+  $('wbTurn').textContent=`ターン ${G.turn}`;
+  renderBanner();renderGrid();renderEvList();renderLog();
+  populateSels();
+}
+
+function renderBanner(){
+  const h=G.sel.filter(n=>isHungry(n));
+  $('wbBanner').innerHTML=h.length
+    ?`<div class="hunger-banner"><div class="h-ico">⚠️</div><div>
+        <div class="h-t">飢餓発生警告！</div>
+        <div class="h-l">${h.map(n=>{const d=G.countries[n],f=food(d);return`<strong>${n}</strong>（食料 ${f} vs 人口 ${d.pop}、不足 ${d.pop-f}）`;}).join('<br>')}</div>
+      </div></div>`
+    :`<div class="safe-banner">✅ 現在、飢餓が発生している国はありません。</div>`;
+}
+
+function renderGrid(){
+  const g=$('wbGrid');g.innerHTML='';
+  [...G.sel,'世界銀行'].forEach(name=>{
+    const isWB=name==='世界銀行',d=gd(name);
+    const h=!isWB&&isHungry(name),diff=isWB?0:food(d)-d.pop;
+    const card=document.createElement('div');
+    card.className='ov-card'+(h?' hungry':'')+(isWB?' wb-c':'');
+    const tRows=[
+      {ico:'👥',lbl:'人口',key:'pop',cls:'pop'},
+      {ico:'🌾',lbl:'農業',key:'farm',cls:'farm'},
+      {ico:'🐟',lbl:'漁業',key:'fish',cls:'fish'},
+      {ico:'🐄',lbl:'畜産',key:'livestock',cls:'live'},
+      {ico:'🚢',lbl:'貿易',key:'trade',cls:'trade'},
+    ];
+    card.innerHTML=`
+      <div class="ov-head">
+        <div class="ov-n ${h?'hungry':isWB?'wb-c':''}">${name}</div>
+        ${isWB?'':`<div class="ov-pill ${h?'danger':'safe'}">${h?'⚠ 飢餓':'✓ 安全'}</div>`}
+      </div>
+      <div class="ov-body">
+        ${tRows.map(t=>`<div class="ov-tr">
+          <span class="ico">${t.ico}</span><span class="lbl">${t.lbl}</span>
+          <span class="vl ${t.cls}">${d[t.key]}</span>
+          <div class="oa">
+            <button class="adj m" onclick="wAdj('${name}','${t.key}',-1)">－</button>
+            <button class="adj p" onclick="wAdj('${name}','${t.key}',1)">＋</button>
+          </div>
+        </div>`).join('')}
+        ${!isWB?`<div class="ov-food">
+          <span class="lbl">食料 vs 人口</span>
+          <span class="vl ${h?'danger':'safe'}">${food(d)} vs ${d.pop}（${diff>=0?'+':''}${diff}）</span>
+        </div>`:''}
+        <div class="ov-money">
+          <span class="lbl">💴 資金</span>
+          <span class="vl">${d.money.toLocaleString()}円</span>
+          <div class="oma">
+            <button class="adj m" onclick="wAdjM('${name}',-10000)">-1万</button>
+            <button class="adj p" onclick="wAdjM('${name}',10000)">+1万</button>
+          </div>
+        </div>
+      </div>`;
+    g.appendChild(card);
+  });
+}
+
+function wAdj(n,k,d){const o=gd(n);o[k]=Math.max(0,o[k]+d);renderWB();}
+function wAdjM(n,d){const o=gd(n);o.money=Math.max(0,o.money+d);renderWB();}
+
+// ===== EVENTS =====
+function renderEvList(){
+  const l=$('evList');l.innerHTML='';
+  (G.evTab==='plus'?PLUS_EV:MINUS_EV).forEach(ev=>{
+    const d=document.createElement('div');
+    d.className=`ev-item ${G.evTab}`;
+    d.innerHTML=`<div class="ev-num">No.${ev.num}</div>
+      <div class="ev-title">${ev.title}</div>
+      <div class="ev-eff">${ev.eff}</div>
+      <div class="ev-desc">${ev.desc}</div>`;
+    d.onclick=()=>openEvM(ev,G.evTab);
+    l.appendChild(d);
+  });
+}
+
+function switchTab(tab){
+  G.evTab=tab;
+  $('tabPlus').className='ev-tab'+(tab==='plus'?' active plus':' plus');
+  $('tabMinus').className='ev-tab'+(tab==='minus'?' active minus':' minus');
+  renderEvList();
+}
+
+function openEvM(ev,type){
+  G.curEv={ev,type};
+  $('emTitle').textContent=ev.title;$('emTitle').className=type;
+  $('emEff').textContent=ev.eff;$('emDesc').textContent=ev.desc;
+  const c=$('emChecks');c.innerHTML='';
+  [...G.sel,'世界銀行'].forEach(n=>{
+    const l=document.createElement('label');l.className='chk';
+    l.innerHTML=`<input type="checkbox" value="${n}" ${n!=='世界銀行'?'checked':''}> ${n}`;
+    c.appendChild(l);
+  });
+  $('evModal').classList.add('open');
+}
+function closeEvM(){$('evModal').classList.remove('open');G.curEv=null;}
+
+function applyEv(){
+  if(!G.curEv)return;
+  const {ev,type}=G.curEv;
+  const ch=[...$('emChecks').querySelectorAll('input:checked')].map(i=>i.value);
+  if(!ch.length){alert('少なくとも1か国を選択してください。');return;}
+
+  const NAMES={pop:'人口',farm:'農業',fish:'漁業',livestock:'畜産',trade:'貿易'};
+  const ICONS={pop:'👥',farm:'🌾',fish:'🐟',livestock:'🐄',trade:'🚢'};
+  const announceLines=[];
+
+  ch.forEach(name=>{
+    const d=gd(name);
+    const changes=[];
+    Object.entries(ev.tok||{}).forEach(([k,v])=>{
+      if(k==='anyFood'){
+        const fs=['farm','fish','livestock'],p=Math.floor(Math.abs(v)/3);
+        fs.forEach(f=>{
+          const before=d[f];
+          d[f]=Math.max(0,d[f]+(v>0?p:-p));
+          const delta=d[f]-before;
+          if(delta!==0)changes.push(`${ICONS[f]}${NAMES[f]} ${delta>0?'+':''}${delta}`);
+        });
+      } else if(v==='half'){
+        const before=d[k];
+        d[k]=Math.floor(d[k]/2);
+        changes.push(`${ICONS[k]||''}${NAMES[k]||k} ${before}→${d[k]}（半分）`);
+      } else if(v==='zero'){
+        changes.push(`${ICONS[k]||''}${NAMES[k]||k} →0（全没収）`);
+        d[k]=0;
+      } else {
+        d[k]=Math.max(0,(d[k]||0)+v);
+        changes.push(`${ICONS[k]||''}${NAMES[k]||k} ${v>0?'+':''}${v}`);
+      }
+    });
+    if(ev.money){
+      d.money=Math.max(0,d.money+ev.money);
+      changes.push(`💴資金 ${ev.money>0?'+':''}${ev.money.toLocaleString()}円`);
+    }
+    if(changes.length)announceLines.push({name,changes});
+    // 各国ログに記録
+    if(name!=='世界銀行' && G.countryLogs[name]!==undefined){
+      const cChanges=[];
+      Object.entries(ev.tok||{}).forEach(([k,v])=>{
+        if(k==='anyFood'){
+          const p=Math.floor(Math.abs(v)/3);
+          ['farm','fish','livestock'].forEach(f=>cChanges.push({key:f,delta:v>0?p:-p}));
+        } else if(v==='half'){
+          const cur=G.countries[name][k];
+          cChanges.push({key:k,delta:cur-cur*2});// show as negative half
+        } else if(v==='zero'){
+          cChanges.push({key:k,delta:0,label:'全没収'});
+        } else {
+          cChanges.push({key:k,delta:v});
+        }
+      });
+      if(ev.money) cChanges.push({key:'money',delta:ev.money});
+      if(cChanges.length) addCLog(name,{type,title:`No.${ev.num} ${ev.title}`,changes:cChanges});
+    }
+  });
+
+  // build announce modal content
+  const isPlus=type==='plus';
+  const color=isPlus?'var(--green)':'var(--red)';
+  let html=`
+    <div style="background:var(--surface);border:1px solid ${color};border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">イベントNo.${ev.num} / ${isPlus?'＋プラス':'－マイナス'}</div>
+      <div style="font-weight:700;font-size:1rem;color:${color};margin-bottom:4px">${ev.title}</div>
+      <div style="font-size:.75rem;color:var(--muted)">${ev.eff}</div>
+    </div>`;
+
+  if(announceLines.length){
+    html+=`<div style="display:flex;flex-direction:column;gap:8px">`;
+    announceLines.forEach(({name,changes})=>{
+      html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;margin-bottom:7px">${name}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${changes.map(c=>`<span style="background:var(--surface);border:1px solid ${color};color:${color};padding:4px 10px;border-radius:6px;font-size:.8rem;font-weight:700">${c}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  } else {
+    html+=`<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:10px">トークン・資金の変動はありません</div>`;
+  }
+
+  $('announceContent').innerHTML=html;
+  addLog('イベント適用',`[${isPlus?'＋':'－'}] No.${ev.num}「${ev.title}」→ ${ch.join(', ')}`,type);
+  closeEvM();
+  $('announceModal').classList.add('open');
+  renderWB();
+}
+
+// ===== TRANSFERS =====
+function populateSels(){
+  ['mTo','tTo','tradeSeller','tradeBuyer'].forEach(id=>{
+    const s=$(id);if(!s)return;
+    s.innerHTML=G.sel.map(n=>`<option value="${n}">${n}</option>`).join('');
+  });
+  if($('tradeBuyer'))$('tradeBuyer').selectedIndex=1;
+}
+function openMM(){$('moneyModal').classList.add('open');}
+function closeMM(){$('moneyModal').classList.remove('open');}
+function openTM(){$('tokenModal').classList.add('open');}
+function closeTM(){$('tokenModal').classList.remove('open');}
+
+function doMM(){
+  const to=$('mTo').value,amt=parseInt($('mAmt').value)||0;
+  if(amt<=0)return;
+  if(G.wb.money<amt){alert('世界銀行の資金が不足しています。');return;}
+  G.wb.money-=amt;G.countries[to].money+=amt;
+  addLog('資金援助',`世界銀行 → ${to}: ${amt.toLocaleString()}円`,'sys');
+  closeMM();renderWB();
+}
+function doTM(){
+  const to=$('tTo').value,type=$('tType').value,amt=parseInt($('tAmt').value)||0;
+  if(amt<=0)return;
+  const nm={farm:'農業',fish:'漁業',livestock:'畜産',trade:'貿易',pop:'人口'};
+  if((G.wb[type]||0)<amt){alert('世界銀行のトークンが不足しています。');return;}
+  G.wb[type]-=amt;G.countries[to][type]=(G.countries[to][type]||0)+amt;
+  addLog('トークン援助',`世界銀行 → ${to}: ${nm[type]}トークン ${amt}個`,'sys');
+  closeTM();renderWB();
+}
+
+// ===== TRADE =====
+function openTrade(){
+  // populate selects
+  ['tradeSeller','tradeBuyer'].forEach(id=>{
+    const s=$(id);
+    s.innerHTML=G.sel.map(n=>`<option value="${n}">${n}</option>`).join('');
+  });
+  $('tradeBuyer').selectedIndex=1;
+  updateTradePreview();
+  // live preview on change
+  ['tradeSeller','tradeBuyer','tradeTokenType','tradeTokenAmt','tradePrice'].forEach(id=>{
+    $(id).oninput=updateTradePreview;
+    $(id).onchange=updateTradePreview;
+  });
+  $('tradeModal').classList.add('open');
+}
+function closeTrade(){$('tradeModal').classList.remove('open');}
+
+function updateTradePreview(){
+  const seller=$('tradeSeller').value;
+  const buyer=$('tradeBuyer').value;
+  const tokType=$('tradeTokenType').value;
+  const tokAmt=parseInt($('tradeTokenAmt').value)||0;
+  const price=parseInt($('tradePrice').value)||0;
+  const NAMES={farm:'農業',fish:'漁業',livestock:'畜産',trade:'貿易'};
+  const ICONS={farm:'🌾',fish:'🐟',livestock:'🐄',trade:'🚢'};
+  const sellerD=G.countries[seller];
+  const buyerD=G.countries[buyer];
+  if(!sellerD||!buyerD||seller===buyer){
+    $('tradePreview').innerHTML=`<div style="color:var(--red);font-size:.78rem;text-align:center">売り手と買い手は異なる国を選んでください</div>`;
+    return;
+  }
+  const sellerHasEnough=sellerD[tokType]>=tokAmt;
+  const buyerHasEnough=buyerD.money>=price;
+  $('tradePreview').innerHTML=`
+    <div style="background:rgba(74,179,232,.07);border:1px solid rgba(74,179,232,.3);border-radius:10px;padding:13px 15px">
+      <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px">📋 取引内容プレビュー</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:.82rem">
+          <span style="color:var(--muted)">${seller}</span>
+          <span style="color:${sellerHasEnough?'#4ab3e8':'var(--red)'}">
+            ${ICONS[tokType]}${NAMES[tokType]} <strong>${tokAmt}個</strong> 譲渡
+            ${!sellerHasEnough?`<span style="color:var(--red);font-size:.7rem">（不足！現在${sellerD[tokType]}個）</span>`:''}
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:.82rem">
+          <span style="color:var(--muted)">${buyer}</span>
+          <span style="color:${buyerHasEnough?'var(--accent)':'var(--red)'}">
+            💴 <strong>${price.toLocaleString()}円</strong> 支払い
+            ${!buyerHasEnough?`<span style="color:var(--red);font-size:.7rem">（不足！現在${buyerD.money.toLocaleString()}円）</span>`:''}
+          </span>
+        </div>
+        ${price===0?`<div style="font-size:.7rem;color:var(--muted);text-align:center">※ 無償譲渡</div>`:''}
+      </div>
+    </div>`;
+}
+
+function doTrade(){
+  const seller=$('tradeSeller').value;
+  const buyer=$('tradeBuyer').value;
+  const tokType=$('tradeTokenType').value;
+  const tokAmt=parseInt($('tradeTokenAmt').value)||0;
+  const price=parseInt($('tradePrice').value)||0;
+  const NAMES={farm:'農業',fish:'漁業',livestock:'畜産',trade:'貿易'};
+  const ICONS={farm:'🌾',fish:'🐟',livestock:'🐄',trade:'🚢'};
+
+  if(seller===buyer){alert('売り手と買い手は異なる国を選んでください。');return;}
+  if(tokAmt<=0){alert('取引数量を入力してください。');return;}
+
+  const sellerD=G.countries[seller];
+  const buyerD=G.countries[buyer];
+  if(sellerD[tokType]<tokAmt){alert(`${seller}の${NAMES[tokType]}トークンが不足しています。\n現在: ${sellerD[tokType]}個`);return;}
+  if(price>0&&buyerD.money<price){alert(`${buyer}の資金が不足しています。\n現在: ${buyerD.money.toLocaleString()}円`);return;}
+
+  // apply
+  sellerD[tokType]-=tokAmt;
+  buyerD[tokType]=(buyerD[tokType]||0)+tokAmt;
+  if(price>0){buyerD.money-=price;sellerD.money+=price;}
+
+  // build announce
+  const priceText=price>0?`${price.toLocaleString()}円`:'無償';
+  const html=`
+    <div style="background:var(--surface);border:1px solid rgba(74,179,232,.4);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;letter-spacing:1px">取引概要</div>
+      <div style="font-weight:700;font-size:.95rem;color:#4ab3e8;text-align:center">
+        ${seller} → ${buyer}
+      </div>
+      <div style="text-align:center;font-size:.8rem;color:var(--muted);margin-top:4px">
+        ${ICONS[tokType]}${NAMES[tokType]}トークン ${tokAmt}個 ／ ${priceText}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;margin-bottom:7px">${seller}（売り手）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="background:var(--surface);border:1px solid var(--red);color:var(--red);padding:4px 10px;border-radius:6px;font-size:.8rem;font-weight:700">${ICONS[tokType]}${NAMES[tokType]} −${tokAmt}</span>
+          ${price>0?`<span style="background:var(--surface);border:1px solid var(--green);color:var(--green);padding:4px 10px;border-radius:6px;font-size:.8rem;font-weight:700">💴 +${price.toLocaleString()}円</span>`:''}
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;margin-bottom:7px">${buyer}（買い手）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span style="background:var(--surface);border:1px solid var(--green);color:var(--green);padding:4px 10px;border-radius:6px;font-size:.8rem;font-weight:700">${ICONS[tokType]}${NAMES[tokType]} +${tokAmt}</span>
+          ${price>0?`<span style="background:var(--surface);border:1px solid var(--red);color:var(--red);padding:4px 10px;border-radius:6px;font-size:.8rem;font-weight:700">💴 −${price.toLocaleString()}円</span>`:''}
+        </div>
+      </div>
+    </div>`;
+
+  $('tradeAnnounceContent').innerHTML=html;
+  addLog('国間取引',`${seller} → ${buyer}: ${NAMES[tokType]}トークン ${tokAmt}個 ／ ${priceText}`,'sys');
+  // 各国ログに記録
+  const tradeTitle=`${seller} → ${buyer} 取引`;
+  const selChanges=[{key:tokType,delta:-tokAmt}];
+  const buyChanges=[{key:tokType,delta:tokAmt}];
+  if(price>0){selChanges.push({key:'money',delta:price});buyChanges.push({key:'money',delta:-price});}
+  addCLog(seller,{type:'trade',title:tradeTitle,changes:selChanges});
+  addCLog(buyer, {type:'trade',title:tradeTitle,changes:buyChanges});
+  closeTrade();
+  $('tradeAnnounceModal').classList.add('open');
+  renderWB();
+}
+
+// ===== TURN / LOG =====
+function changeTurn(d){
+  G.turn=Math.max(1,G.turn+d);
+  if(d>0)addLog(`ターン${G.turn}`,'ターンが進みました','sys');
+  renderWB();
+}
+function addLog(title,msg,type){
+  G.log.unshift({turn:G.turn,title,msg,type,time:new Date().toLocaleTimeString('ja-JP')});
+  renderLog();
+}
+function renderLog(){
+  const el=$('logEl');if(!el)return;
+  if(!G.log.length){el.innerHTML='<span style="color:var(--muted)">まだ記録はありません。</span>';return;}
+  el.innerHTML=G.log.slice(0,60).map(e=>
+    `<div class="le ${e.type==='plus'?'pl':e.type==='minus'?'mi':'sy'}">
+      <span class="tt">T${e.turn}</span><span style="color:var(--muted);margin-right:5px">${e.time}</span>
+      <span class="et">[${e.title}]</span> ${e.msg}
+    </div>`).join('');
+}
+function clearLog(){G.log=[];renderLog();}
+</script>
+</body>
+</html>
